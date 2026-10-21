@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="es" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Trivia con Nico :D</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Custom Styles -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+        
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #0a0a0c;
+            color: #f3f4f6;
+        }
+
+        /* Glassmorphism card effects */
+        .glass-card {
+            background: rgba(18, 20, 29, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+        }
+
+        .glass-card-interactive {
+            background: rgba(18, 20, 29, 0.65);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .glass-card-interactive:hover {
+            border-color: rgba(132, 204, 22, 0.4);
+            background: rgba(24, 28, 41, 0.85);
+            box-shadow: 0 10px 30px -10px rgba(132, 204, 22, 0.15);
+            transform: translateY(-2px);
+        }
+
+        /* Typography glows */
+        .neon-glow-text {
+            text-shadow: 0 0 25px rgba(132, 204, 22, 0.35);
+        }
+
+        /* Button glow effect */
+        .emerald-glow-btn {
+            position: relative;
+            background: linear-gradient(135deg, #84cc16 0%, #10b981 100%);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 20px rgba(132, 204, 22, 0.25);
+        }
+
+        .emerald-glow-btn:hover {
+            box-shadow: 0 0 35px rgba(132, 204, 22, 0.5);
+            transform: scale(1.01);
+        }
+
+        /* Ambient Glow Background Orbs */
+        .glow-orb-1 {
+            position: fixed;
+            top: -10%;
+            left: 20%;
+            width: 45vw;
+            height: 45vw;
+            background: radial-gradient(circle, rgba(132, 204, 22, 0.12) 0%, rgba(16, 185, 129, 0.03) 50%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(60px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .glow-orb-2 {
+            position: fixed;
+            bottom: -5%;
+            right: 10%;
+            width: 50vw;
+            height: 50vw;
+            background: radial-gradient(circle, rgba(16, 185, 129, 0.1) 0%, rgba(132, 204, 22, 0.02) 50%, rgba(0, 0, 0, 0) 70%);
+            filter: blur(80px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        #fireworks-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 50;
+        }
+
+        /* Smooth reveal animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(12px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.5s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-16 flex flex-col items-center justify-start overflow-x-hidden relative">
+
+    <!-- Background Orbs -->
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
+
+    <canvas id="fireworks-canvas"></canvas>
+
+    <!-- Header / Hero Section -->
+    <header class="w-full max-w-4xl px-6 pt-16 pb-10 text-center relative z-10">
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-lime-500/10 text-lime-400 font-semibold text-xs tracking-wider uppercase mb-6 border border-lime-500/20 backdrop-blur-md">
+            <i data-lucide="sparkles" class="w-3.5 h-3.5"></i>
+            EDICIÓN ESPECIAL DE CUMPLEAÑOS
+        </div>
+        <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-white mb-6 leading-tight">
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-emerald-400 to-teal-300 neon-glow-text">Trivia con Nico :D</span>
+        </h1>
+        <p class="text-slate-400 text-base md:text-lg max-w-2xl mx-auto font-normal leading-relaxed">
+            Hoy celebramos tu cumpleaños: un momento ideal para recordar los chismes ilimitados entre series y récords insuperables de momentos compartidos
+        </p>
+    </header>
+
+    <main class="w-full max-w-4xl px-6 space-y-12 relative z-10">
+
+        <!-- Dashboard Section: Stats -->
+        <section class="space-y-4">
+            <div class="flex items-center gap-3 mb-3">
+                <div class="p-2 rounded-lg bg-lime-500/10 text-lime-400 border border-lime-500/20">
+                    <i data-lucide="activity" class="w-5 h-5"></i>
+                </div>
+                <h2 class="text-xl font-bold text-white tracking-wide">Métricas de Amistad & Momentos</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Stat 1 -->
+                <div class="glass-card p-5 rounded-2xl text-center flex flex-col items-center justify-center">
+                    <div class="p-3 bg-lime-500/10 rounded-xl mb-3 text-lime-400 border border-lime-500/20">
+                        <i data-lucide="calendar" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-3xl font-extrabold text-white tracking-tight">365+</span>
+                    <span class="text-xs text-slate-400 font-medium mt-1 uppercase tracking-wider">Días de Amistad</span>
+                </div>
+
+                <!-- Stat 2 -->
+                <div class="glass-card p-5 rounded-2xl text-center flex flex-col items-center justify-center">
+                    <div class="p-3 bg-lime-500/10 rounded-xl mb-3 text-lime-400 border border-lime-500/20">
+                        <i data-lucide="shield" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-3xl font-extrabold text-white tracking-tight">100 kg</span>
+                    <span class="text-xs text-slate-400 font-medium mt-1 uppercase tracking-wider">PR de Paciencia</span>
+                </div>
+
+                <!-- Stat 3 -->
+                <div class="glass-card p-5 rounded-2xl text-center flex flex-col items-center justify-center">
+                    <div class="p-3 bg-lime-500/10 rounded-xl mb-3 text-lime-400 border border-lime-500/20">
+                        <i data-lucide="message-square" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-3xl font-extrabold text-white tracking-tight">Ilimitado</span>
+                    <span class="text-xs text-slate-400 font-medium mt-1 uppercase tracking-wider">Chismes & Audios</span>
+                </div>
+
+                <!-- Stat 4 -->
+                <div class="glass-card p-5 rounded-2xl text-center flex flex-col items-center justify-center">
+                    <div class="p-3 bg-lime-500/10 rounded-xl mb-3 text-lime-400 border border-lime-500/20">
+                        <i data-lucide="zap" class="w-5 h-5"></i>
+                    </div>
+                    <span class="text-3xl font-extrabold text-white tracking-tight">100%</span>
+                    <span class="text-xs text-slate-400 font-medium mt-1 uppercase tracking-wider">Lealtad & Apoyo</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Trivia Section -->
+        <section id="trivia-section" class="glass-card rounded-3xl p-6 md:p-8 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-6 border-b border-slate-800 pb-4">
+                <div class="flex items-center gap-3">
+                    <div class="p-2 rounded-lg bg-lime-500/10 text-lime-400 border border-lime-500/20">
+                        <i data-lucide="brain-circuit" class="w-5 h-5"></i>
+                    </div>
+                    <h2 class="text-xl font-bold text-white tracking-wide">Trivia de Anécdotas</h2>
+                </div>
+                <div class="text-xs font-semibold px-3 py-1 rounded-full bg-slate-800/80 text-lime-400 border border-slate-700">
+                    Pregunta <span id="current-question-num">1</span> de 3
+                </div>
+            </div>
+
+            <!-- Quiz Container -->
+            <div id="quiz-container" class="space-y-6">
+                <!-- Question Title -->
+                <h3 id="question-text" class="text-lg md:text-xl font-semibold text-slate-100 leading-snug">
+                    Cargando pregunta...
+                </h3>
+
+                <!-- Options -->
+                <div id="options-container" class="grid grid-cols-1 gap-3">
+                    <!-- Options injected dynamically -->
+                </div>
+
+                <!-- Feedback Area -->
+                <div id="feedback-area" class="hidden p-5 rounded-2xl bg-slate-900/90 border border-slate-800 text-center space-y-4">
+                    <p id="feedback-text" class="text-lime-400 font-medium text-base md:text-lg leading-relaxed"></p>
+                    <button id="next-btn" onclick="nextQuestion()" class="emerald-glow-btn px-6 py-2.5 rounded-xl text-slate-950 font-bold hover:brightness-110 transition-all text-sm tracking-wide">
+                        Siguiente Pregunta ➔
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Birthday Reward Section (Initially Hidden) -->
+        <section id="reward-section" class="hidden glass-card rounded-3xl p-8 md:p-12 text-center space-y-8 animate-fade-in relative overflow-hidden">
+            <div class="inline-flex p-4 rounded-2xl bg-lime-500/10 text-lime-400 border border-lime-500/20 mb-2">
+                <i data-lucide="trophy" class="w-10 h-10"></i>
+            </div>
+
+            <div class="space-y-2">
+                <h2 class="text-3xl md:text-5xl font-extrabold text-white tracking-tight">
+                    Trivia Completada
+                </h2>
+                <p class="text-lime-400 text-lg font-medium">
+                    Has desbloqueado la Tarjeta VIP de Cumpleaños
+                </p>
+            </div>
+
+            <div class="bg-slate-950/70 p-6 md:p-8 rounded-2xl border border-slate-800/80 text-left space-y-4 shadow-2xl max-w-2xl mx-auto font-normal text-slate-300 leading-relaxed">
+                <p class="text-lg">
+                    ¡Feliz cumpleaños a mi amiga favorita!
+                </p>
+                <p class="text-base">
+                    Gracias por ser una persona excepcional que siempre aporta buena energía, risas compartidas y momentos inolvidables
+                </p>
+                <p class="text-base">
+                    Deseo que este nuevo año de vida llegue cargado de metas alcanzadas, éxitos y mucha felicidad en todo lo que te propongas
+                </p>
+                <div class="text-right text-lime-400 font-bold text-base pt-2">
+                    Con mucho cariño y agradecimiento <br>Daniel CG. <br> <br> <span style="font-size: 12px;">PD: No supe como colocar el texto de arriba en el centro jsksjdskjsd <br><span style="font-size: 9px;">Ultima actualizacion: Esta pagina la tenia terminada y se me borro (esta es la 2.0)</small>
+
+                </div>
+            </div>
+
+            <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-4">
+                <button onclick="launchEffects()" class="emerald-glow-btn w-full sm:w-auto px-8 py-4 rounded-xl text-slate-950 font-bold text-base flex items-center justify-center uppercase tracking-wide">
+                    click aqui muchas veces
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="mt-16 text-center text-slate-600 text-xs tracking-wider uppercase relative z-10">
+        Diseñado exclusivamente para una amiga extraordinaria (Osea Nico :D)
+    </footer>
+
+    <!-- Logic Script -->
+    <script>
+        // Trivia Data with exact specified questions and answers
+        const quizData = [
+            {
+                question: "¿Qué fue lo primero que pensaste al conocerme?",
+                options: [
+                    "Se ve una persona tranquila, seria y muy educada... qué equivocada estaba",
+                    "Parecía una persona de pocas palabras hasta que le tomé confianza y no volvió a callar",
+                    "El esta mas guapo que la Gaby",
+                    "Disocia bien chimba jajaja"
+                ],
+                feedbacks: [
+                    "Casi siempre pasa",
+                    "Cuando hay confianza no hay freno a las palabras",
+                    "Lo se, lo se, es algo obvio",
+                    "El estado de disociación en su máxima expresión"
+                ]
+            },
+            {
+                question: "¿Cuál es nuestra actividad favorita cuando estamos juntos?",
+                options: [
+                    "Analizar la vida de los demás durante 3 horas seguidas sin ver la hora",
+                    "Decir \"voy a llegar temprano al gym\" y aparecer media hora tarde como de costumbre",
+                    "Planear viajes o salidas que probablemente no hagamos",
+                    "¡Que se joda aguebardo!"
+                ],
+                feedbacks: [
+                    "El tiempo se pasa volando cuando el tema está bueno",
+                    "La impuntualidad también cuenta como disciplina jajaja",
+                    "Algun dia se haran",
+                    "¡Que se joda ese perro!"
+                ]
+            },
+            {
+                question: "¿Cuál es nuestra regla no escrita con los mensajes de Instagram?",
+                options: [
+                    "Mandar audios de 4 minutos explicándote algo que cabía en dos palabras",
+                    "Desaparecer 8 horas y luego responder con un \"jajajaja uy no\"",
+                    "Mandar reels aleatorios sin ningún tipo de contexto",
+                    "Responder al instante si hay un chisme caliente de por medio",
+                    "Todas las anteriores"
+                ],
+                feedbacks: [
+                    "Los podcast en notas de voz son la especialidad de la casa",
+                    "Caes mal por eso JAJAJAJA",
+                    "Suelen ser epicos :D",
+                    "La prioridad número uno siempre es la información importante",
+                    "Totalmente de acuerdo JAJAJA"
+                ]
+            }
+        ];
+
+        let currentQuestion = 0;
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Load Question Function
+        function loadQuestion() {
+            const q = quizData[currentQuestion];
+            document.getElementById('current-question-num').innerText = currentQuestion + 1;
+            document.getElementById('question-text').innerText = q.question;
+
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = "glass-card-interactive w-full text-left p-4 rounded-xl font-medium text-slate-300 flex items-start gap-3.5 group";
+                btn.onclick = () => selectOption(index);
+                btn.innerHTML = `
+                    <span class="w-7 h-7 rounded-lg bg-slate-900/80 text-lime-400 border border-slate-700/80 flex items-center justify-center font-bold text-xs shrink-0 group-hover:border-lime-400/80 group-hover:bg-lime-500 group-hover:text-slate-950 transition-all">
+                        ${String.fromCharCode(65 + index)}
+                    </span>
+                    <span class="mt-0.5 text-sm md:text-base leading-snug">${opt}</span>
+                `;
+                optionsContainer.appendChild(btn);
+            });
+
+            document.getElementById('feedback-area').classList.add('hidden');
+        }
+
+        // Option selection handler
+        function selectOption(index) {
+            const q = quizData[currentQuestion];
+            const feedbackText = document.getElementById('feedback-text');
+            const feedbackArea = document.getElementById('feedback-area');
+
+            feedbackText.innerText = q.feedbacks[index];
+            feedbackArea.classList.remove('hidden');
+
+            // Quick confetti burst on answer
+            confetti({
+                particleCount: 20,
+                spread: 50,
+                origin: { y: 0.75 },
+                colors: ['#84cc16', '#10b981', '#ffffff']
+            });
+        }
+
+        // Advance to next question or show reward
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < quizData.length) {
+                loadQuestion();
+            } else {
+                finishQuiz();
+            }
+        }
+
+        // Complete Quiz
+        function finishQuiz() {
+            document.getElementById('trivia-section').classList.add('hidden');
+            const rewardSection = document.getElementById('reward-section');
+            rewardSection.classList.remove('hidden');
+            
+            rewardSection.scrollIntoView({ behavior: 'smooth' });
+            launchEffects();
+        }
+
+        // Confetti & Celebration Effects
+        function launchEffects() {
+            var duration = 3 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0, colors: ['#84cc16', '#10b981', '#38bdf8', '#ffffff'] };
+
+            function randomInRange(min, max) {
+              return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+              var timeLeft = animationEnd - Date.now();
+
+              if (timeLeft <= 0) {
+                return clearInterval(interval);
+              }
+
+              var particleCount = 50 * (timeLeft / duration);
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+              confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+
+        // Initialize on page load
+        window.onload = function() {
+            loadQuestion();
+        };
+    </script>
+</body>
+</html>
